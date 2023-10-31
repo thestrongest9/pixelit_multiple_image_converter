@@ -1,3 +1,9 @@
+# Pixel It Multiple Converter
+Check "index.html" in src folder for code.
+Sample images in "images" folder in src.
+Adjust color, image size, etc in index.html
+Run with http-server (npm) then localhost:8080
+
 # Pixel It
 
 Javascript library to create pixel art from an image.
