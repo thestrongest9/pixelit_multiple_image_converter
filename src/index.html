@@ -1,0 +1,127 @@
+<img src="./images/1.png"  id="pixelitimg" alt="">
+<canvas id="pixelitcanvas"  willReadFrequently="true"></canvas>
+<canvas id="pixelitcanvas"  willReadFrequently="true"></canvas>
+<canvas id="pixelitcanvas"  willReadFrequently="true"></canvas>
+<script src="pixelit.js"></script>
+<script>
+    //FIXME: IMAGES MUST BE NAMED IN ORDER WITH NUMBERS
+
+    //CODE JUST PUTS ALL IMAGES FROM /images FOLDER INTO SERVER.
+    //Modified version of: https://stackoverflow.com/questions/55268506/how-do-i-fetch-all-images-in-a-folder-with-ajax-using-pure-js/
+    //and: https://stackoverflow.com/questions/18480550/how-to-load-all-the-images-from-one-of-my-folder-into-my-web-page-using-jquery
+    var xhr = new XMLHttpRequest(); 
+    xhr.open("GET", "/images", true);
+    xhr.responseType = 'document';
+    temp = 0;
+    xhr.onload = () => {
+    if (xhr.status === 200) { //after done processing.
+        var elements = xhr.response.getElementsByTagName("a");
+        for (x of elements) {
+            if ( x.href.match(/\.(jpe?g|png|gif)$/) ) { 
+                const img = document.createElement("img");
+                const can = document.createElement("canvas");
+                img.src = x.href;
+                // img.id = String(temp);
+                // list_of_ids.push(String(temp));
+                // document.body.appendChild(img);
+                temp += 1;
+            } 
+        };
+    } else {
+        alert('Request failed. Returned status of ' + xhr.status);
+    }
+    }
+    xhr.send();
+
+    const config = { //config for pixellate: https://giventofly.github.io/pixelit/
+        // to : img,
+        //defaults to document.getElementById("pixelitcanvas")
+        // from : val, 
+        //defaults to document.getElementById("pixelitimg")
+        scale : 25, //25
+        //from 0-50, defaults to 8
+        palette : [[33,37,41], [97,71,80], [140,92,71], [180,125,88], [217, 183, 126], [234, 217, 167]],  //set palette (Currently Sepia6)
+        //defaults to a fixed pallete
+        maxHeight: 480, //480
+        //defaults to null
+        maxWidth: 640, //640
+        //defaults to null
+    }
+
+    const timer = ms => new Promise(res => setTimeout(res, ms));
+    // var len = 90;
+    // for (var i = 1; i < len; i++) {
+    //     await playAnimation(i); 
+    // } 
+
+    //code used, for using promise to wait until image is loaded: https://stackoverflow.com/a/63473804
+    async function startAnimation() {
+        var len = 103;
+        for (var i = 1; i < len; i++) {
+            // console.log("ONE FRAME")
+            start_time = performance.now();
+            await playAnimation(i, start_time); 
+        }
+    }
+
+    // const timer = ms => new Promise(res => setTimeout(res, ms));
+    function sleep(ms) { //sleep function from https://www.tutorialspoint.com/javascript-sleep-function
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    function playAnimation(len, start_time) {
+        return new Promise(resolve => {
+            var image = document.images[0];
+            var downloadingImage = new Image();
+            var temp = 1;
+            downloadingImage.src = `./images/${len}.jpg`;
+            downloadingImage.onload = function(){
+                image.src = this.src; //change source of image
+                //create object
+                const px = new pixelit(config); //pixellates image. using: https://giventofly.github.io/pixelit/
+                px.draw().pixelate().convertPalette().resizeImage(); //.saveImage(); => save image after conversion.
+                // console.log(performance.now(), start_time + 1000);
+                temp += 1;
+                var millisecond_delay = 40;
+                if (performance.now() < start_time + millisecond_delay) { //sleep a minimum amount of time before activating
+                    sleep((start_time+millisecond_delay)-performance.now());
+                    // console.log("one") //check sequence with two.
+                }
+                // console.log("two") //check sequence with one
+                resolve(true);
+                // if (performance.now() > start_time + 1000) { //minimum time of 24 milliseconds between new frame
+                //     return resolve(true);
+                // } else {
+                //     console.log("RECURSION");
+                //     return playAnimation(len, start_time-1); //decrement one from start time.
+                // }
+            }
+            // console.log(this);
+        })
+    }
+
+    startAnimation();
+
+    // const timer = ms => new Promise(res => setTimeout(res, ms));
+    // var len = 90;
+    // for (var i = 1; i < len; i++) {
+    //     playAnimation(i); 
+    // }
+    // // const timer = ms => new Promise(res => setTimeout(res, ms));
+    // async function playAnimation(len) {
+    //     // for (var i = 1; i < len; i++) {
+    //         var image = document.images[0];
+    //         var downloadingImage = new Image();
+    //         downloadingImage.src = `./images/${len}.png`;
+    //         downloadingImage.onload = function(){
+    //             image.src = this.src; //change source of image
+    //             //create object
+    //             const px = new pixelit(config); //pixellates image. using: https://giventofly.github.io/pixelit/
+    //             px.draw().pixelate().convertPalette().resizeImage();
+    //         }
+    //         // downloadingImage.src = `./images/${i}.png`;
+    //         // downloadingImage.src = `./images/${len}.png`;
+    //         await timer(24); //delay
+    //     // }
+    // }
+    // playAnimation(90);
+    </script>
